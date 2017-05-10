@@ -20,16 +20,21 @@ void ofApp::setup(){
 
     
     fbo.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA32F);
-    ofSetBackgroundColor(32, 38, 38);
+    ofSetBackgroundColor(39, 36, 37);
     
 
     ofEnableAlphaBlending();
     ofEnableSmoothing();
     ofSetFrameRate(120.0f);
-    ofBackground(32,38,38);
-    ofSetCircleResolution(60);
+    ofBackground(39,36,37);
+    ofSetCircleResolution(100);
     //
     
+    for(int i=0; i<NSMOG0; i++){
+        mySnow[i].setup();
+        
+    }
+
     
     for(int i = 0; i < 3; i++){
         
@@ -73,6 +78,10 @@ ard.connect("/dev/cu.HC-05-DevB-1", 9600);
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    for(int i=0; i<NSMOG0; i++){
+        mySnow[i].update();
+    }
 
     if (Num > 0){ Num = ofRandom(0,3);}
    
@@ -96,11 +105,11 @@ void ofApp::update(){
     
     float *val = ofSoundGetSpectrum(numBands);
 
-    count1 += spectrum[1];
+    count1 += spectrum[3];
     
     for (int i = 0; i < numBands; i++) {
-        spectrum[i] *= 0.95;
-        spectrum[i] = max(spectrum[i] * ofRandom(0.02, 0.05), val[i]);
+        spectrum[i] *= 0.85;
+        spectrum[i] = max(spectrum[i] * ofRandom(0.04, 0.07), val[i]);
     }
 
 
@@ -157,6 +166,7 @@ void ofApp::draw(){
         lastMillis = ofGetElapsedTimef();
 
 
+        
     if(speed >20){
         
         fbo.begin();
@@ -167,10 +177,10 @@ void ofApp::draw(){
         
         ofPushMatrix();
       
-        ofSetColor(32,38,38,20);
+        ofSetColor(39,36,37,20);
         ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
         
-        ofSetColor(237,182,25);
+        ofSetColor(255,194,93);
         ofDrawCircle(ofGetWidth()/2, ofGetHeight()/2, speed*3);
         
         //sound.play();
@@ -181,6 +191,8 @@ void ofApp::draw(){
             Num ++;
             
         }
+        
+  
         
         cout<<"Num: "<<Num<<endl;
         sound.load(songName[Num]+".mp3");
@@ -193,6 +205,8 @@ void ofApp::draw(){
         
         fbo.draw(0,0);
         
+      
+        
         ofSetColor(255, 255, 255, 255);
         ofImage img = gifloader.pages[index];
         ofPixels pix = img.getPixels();
@@ -202,22 +216,28 @@ void ofApp::draw(){
         img.draw(ofGetWidth()/2 - i/2,ofGetHeight()/2-j/2);
        
         
-//        
-//        ofSetColor(255, 255, 255, 255);
-//        ofImage img01 = gifloader01.pages[index01];
-//        ofPixels pix01 = img01.getPixels();
-//        img01.setFromPixels(pix01);
-//        float q = img01.getWidth();
-//        float w = img01.getHeight();
-//        img01.draw((ofGetWidth()/2 - q/2)-200,(ofGetHeight()/2-w/2)-200);
         
     }
+    if(speed >100){
+        int c = ofRandom(30,50);
+        ofSetColor(200+c, 49, 137);
+        ofDrawRectangle(0,0,ofGetWidth(),ofGetHeight());
+        for(int i=0; i<NSMOG0; i++){
+            ofSetColor(0,182,25);
+            mySnow[i].draw();
+            
+        }
+        ofSetColor(255, 255, 255, 255);
+        ofImage img = gifloader.pages[index];
+        ofPixels pix = img.getPixels();
+        img.setFromPixels(pix);
+        float i = img.getWidth();
+        float j = img.getHeight();
+        img.draw(ofGetWidth()/2 - i/2,ofGetHeight()/2-j/2);
     
+
     
-//    if(speed >100){
-//        ofSetColor(0,182,25);
-//        ofDrawCircle(ofGetWidth()/2 + 100, ofGetHeight()/2, speed/3);
-//    }
+    }
 
     if(speed != -2147483648 && speed > 0){
         
@@ -230,16 +250,16 @@ void ofApp::draw(){
     for (int i = 0; i < numBands; i++) {
         float x = radius * cos(ofDegToRad(i));
         float y = radius * sin(ofDegToRad(i));
-        float size = spectrum[i] * ofRandom(100, 200);
+        float size = spectrum[i] * ofRandom(150, 250);
         size *= ofRandom(-1, 1);
         
-        int c = ofRandom(30,80);
-        ofSetColor(c, 90, 209);
+        int c = ofRandom(30,50);
+        ofSetColor(200+c, 49, 137);
         ofDrawCircle(x, y, size);
     }
     
     float radius2 = 360;
-    for (int i = 0; i < numBands; i += 2) {
+    for (int i = 0; i < numBands; i += 5) {
         float time = sTime * a + ofGetElapsedTimef();
         rX = ofSignedNoise(time * 0.1) * radius2;
         rY = ofSignedNoise(time * 0.1) * radius2;
@@ -264,27 +284,26 @@ void ofApp::draw(){
         ofRotateX(rX);
         ofRotateY(rY);
         ofRotateZ(rZ);
-        int c = ofRandom(40,100);
-        ofSetColor(240, c, 37);
+        ofSetColor(13,100, 239);
  
         ofDrawLine(a,b,a2,b2);
         ofDrawRectangle(x, y, size, size);
     }
     
     
-    float radius3 = speed*2;
+    float radius3 = speed*3;
     for (int i = 0; i < numBands; i++) {
         float x = radius3 * sin(ofDegToRad(i)) +  spectrum[i];
         float y = radius3 * cos(ofDegToRad(i)) +  spectrum[i];
-        float x2 = radius3 * sin(ofDegToRad(i))* ofRandom(1, 3);
-        float y2 = radius3 * cos(ofDegToRad(i))* ofRandom(1, 3);
+        float x2 = radius3 * sin(ofDegToRad(i))* ofRandom(1, 2);
+        float y2 = radius3 * cos(ofDegToRad(i))* ofRandom(1, 2);
 //
         
    
-        ofSetColor(208, 198, 233,ofRandom(30,40));
+        ofSetColor(233, 229, 218,ofRandom(30,40));
         ofDrawLine(x, y, x2, y2);
         ofSetColor(255);
-        ofDrawRectangle((x2-x)+3,(y2-y)+3,speed/100, speed/100);
+        ofDrawRectangle((x2-x)+5,(y2-y)+5,speed/100, speed/100);
         
     
 //
@@ -295,6 +314,8 @@ void ofApp::draw(){
 
 
 }
+
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
