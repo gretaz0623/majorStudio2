@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxGif.h"
 
 #define blue 56 90 209
 #define yellow 237 182 25
@@ -27,11 +28,27 @@ class ofApp : public ofBaseApp{
     
         ofArduino	ard;
         bool		bSetupArduino;// flag variable for setting up arduino once
-        ofSoundPlayer music;
+
+    
+        string songName[3];
+        string num[3];
+    
+        ofxGIF::fiGifLoader gifloader;
+        int index = 10;
+        float gifDelay = 100;
+        float startTime;
+    
+//        ofxGIF::fiGifLoader gifloader01;
+//        int index01 = ofRandom(0,4);
+//        float gifDelay01 = 100;
+//        float startTime01;
+//    
+
     
     private:
     
         void setupArduino(const int & version);
         void updateArduino();
+    
 		
 };
